@@ -19,28 +19,34 @@ export const Registration = defineComponent({
       last_name: "",
       email: "",
       password: "",
-      is_active: true,
     });
 
     const submit = () => {
-      dispatch("registration", data).then(() => {
-        push({ name: "Login" });
-      });
+      dispatch("registration", data)
+        .then(() => {
+          push({ name: "Login" });
+        })
+        .catch((e) => e);
     };
 
     const onChangeInput = (e, name) => {
       data[name] = e.target.value;
     };
 
+    const prevent = (e) => {
+      e.preventDefault();
+    };
+
     return () =>
       h(
-        <div class="form">
+        <form class="form" onClick={prevent}>
           <pre-login></pre-login>
           <div>
             <label for="first">Имя</label>
             <input
               type="text"
               id="first"
+              autocomplete
               onChange={() => onChangeInput(event, "first_name")}
             />
           </div>
@@ -49,6 +55,7 @@ export const Registration = defineComponent({
             <input
               type="text"
               id="last"
+              autocomplete
               onChange={() => onChangeInput(event, "last_name")}
             />
           </div>
@@ -57,27 +64,30 @@ export const Registration = defineComponent({
             <input
               type="text"
               id="phone"
+              autocomplete
               onChange={() => onChangeInput(event, "phone")}
             />
           </div>
           <div>
-            <label for="email">@mail</label>
+            <label for="email">Email</label>
             <input
               type="text"
               id="email"
+              autocomplete
               onChange={() => onChangeInput(event, "email")}
             />
           </div>
           <div>
             <label for="pass">Пароль</label>
             <input
-              type="text"
+              type="password"
               id="pass"
+              autocomplete
               onChange={() => onChangeInput(event, "password")}
             />
           </div>
           <button onclick={submit}>Регистрация</button>
-        </div>
+        </form>
       );
   },
 });

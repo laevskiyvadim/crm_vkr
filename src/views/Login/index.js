@@ -26,15 +26,20 @@ export const Login = defineComponent({
       data[name] = e.target.value;
     };
 
+    const prevent = (e) => {
+      e.preventDefault();
+    };
+
     return () =>
       h(
-        <div class="form">
+        <form class="form" onClick={prevent}>
           <pre-login></pre-login>
           <div>
-            <label for="login">Логин</label>
+            <label for="login">Логин (Email)</label>
             <input
               type="text"
               id="login"
+              autocomplete
               onChange={() => onChangeInput(event, "email")}
             />
           </div>
@@ -42,12 +47,13 @@ export const Login = defineComponent({
             <label for="pass">Пароль</label>
             <input
               type="password"
+              autocomplete
               id="pass"
               onChange={() => onChangeInput(event, "password")}
             />
           </div>
           <button onclick={submit}>Логин</button>
-        </div>
+        </form>
       );
   },
 });

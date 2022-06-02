@@ -1,17 +1,18 @@
 import axios from "axios";
-axios.defaults.withCredentials = true;
-axios.defaults.crossDomain = true;
-const token = localStorage.getItem("authToken");
-if (token) axios.defaults.headers["Authorization"] = `Token ${token}`;
-axios.defaults.xsrfHeaderName = "x-csrftoken";
-axios.defaults.xsrfCookieName = "csrftoken";
-
 import { createStore } from "vuex";
+
+const api = axios.create({ baseURL: "http://localhost:8000" });
+
+api.defaults.withCredentials = true;
+api.defaults.crossDomain = true;
+const token = localStorage.getItem("authToken");
+if (token) api.defaults.headers["Authorization"] = `Token ${token}`;
+api.defaults.xsrfHeaderName = "x-csrftoken";
+api.defaults.xsrfCookieName = "csrftoken";
 
 export const store = createStore({
   state() {
     return {
-      baseURL: "http://localhost:8000",
       token: localStorage.getItem("authToken") || null,
       links: [
         {
@@ -40,7 +41,7 @@ export const store = createStore({
     delete_token(state) {
       localStorage.removeItem("authToken");
       state.token = null;
-      delete axios.defaults.headers["Authorization"];
+      delete api.defaults.headers["Authorization"];
       const myDate = new Date();
       myDate.setTime(myDate.getTime() - 1);
       document.cookie = "csrftoken=; expires=" + myDate.toGMTString();
@@ -60,30 +61,29 @@ export const store = createStore({
   },
 
   actions: {
-    async login({ commit, state }, data) {
-      const { baseURL } = state;
-      await axios["post"](`${baseURL}/auth/token/login/`, data)
+    async login({ commit }, data) {
+      await api
+        .post("/auth/token/login/", data)
         .then((resp) => resp.data)
         .then((token) => {
           commit("set_token", token.auth_token);
-          axios.defaults.headers["Authorization"] = `Token ${token.auth_token}`;
+          api.defaults.headers["Authorization"] = `Token ${token.auth_token}`;
         });
     },
     // todo
-    async registration({ state }, data) {
-      const { baseURL } = state;
-      await axios["post"](`${baseURL}/auth/users/`, data);
+    async registration({ commit }, data) {
+      commit;
+      await api.post(`/auth/users/`, data);
     },
-    async logout({ commit, state }) {
-      const { baseURL } = state;
-      await axios.post(`${baseURL}/auth/token/logout/`, {}).then(() => {
+
+    async logout({ commit }) {
+      await api.post(`/auth/token/logout/`, {}).then(() => {
         commit("delete_token");
       });
     },
-    async getTasks({ commit, state }) {
-      const { baseURL } = state;
-      await axios
-        .get(`${baseURL}/api/tasks/`)
+    async getTasks({ commit }) {
+      await api
+        .get(`/api/tasks/`)
         .then((response) => response.data)
         .then((data) => {
           commit("set_tasks", data.tasks);
@@ -95,14 +95,13 @@ export const store = createStore({
     },
     async addTask({ commit, state }, { id, ...data }) {
       id;
-      const { baseURL } = state;
       const info = {
         user: state.currentUser.id,
         stageOfExecution: "Задачи",
         ...data,
       };
-      await axios
-        .post(`${baseURL}/api/tasks/`, info)
+      await api
+        .post(`/api/tasks/`, info)
         .then((response) => response.data)
         .then((tasks) => {
           commit("set_tasks", tasks);
@@ -111,10 +110,9 @@ export const store = createStore({
           console.log(e.response.status);
         });
     },
-    async updateTask({ commit, state }, { id, ...data }) {
-      const { baseURL } = state;
-      await axios
-        .put(`${baseURL}/api/tasks/${id}/`, data)
+    async updateTask({ commit }, { id, ...data }) {
+      await api
+        .put(`/api/tasks/${id}/`, data)
         .then((response) => response.data)
         .then((data) => {
           commit("set_tasks", data);
@@ -123,10 +121,9 @@ export const store = createStore({
           console.log(e.response.status);
         });
     },
-    async deleteTask({ commit, state }, id) {
-      const { baseURL } = state;
-      axios
-        .delete(`${baseURL}/api/tasks/${id}/`)
+    async deleteTask({ commit }, id) {
+      await api
+        .delete(`/api/tasks/${id}/`)
         .then((response) => {
           if (response.status === 204) {
             commit("delete_task", id);
