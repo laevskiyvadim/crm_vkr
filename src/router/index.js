@@ -1,25 +1,51 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
-import Home from '../views/Home.vue'
+import { createRouter, createWebHistory } from "vue-router";
+import { Canban } from "../components/Canban";
 
+import { ClientList } from "../components/ClientList";
+import { Content } from "../views/Content";
+import { Login } from "../views/Login";
+import { Registration } from "../views/Registration";
+
+const isAuthorized = () => localStorage.getItem("authToken");
+const authGuard = (to, from, next) => {
+  !isAuthorized() ? next({ name: "Login" }) : next();
+};
+
+const asyncLoad = (component, folder = "components") =>
+  import(`../${folder}/${component}`).then((result) => result[component]);
+asyncLoad;
 const routes = [
   {
-    path: '/',
-    name: 'Home',
-    component: Home
+    path: "/",
+    name: "Main",
+    beforeEnter: authGuard,
+    component: Content,
+    children: [
+      {
+        path: "/list",
+        name: "List",
+        component: ClientList,
+      },
+      {
+        path: "/canban",
+        name: "Canban",
+        component: Canban,
+      },
+    ],
   },
   {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  }
-]
+    path: "/login",
+    name: "Login",
+    component: Login,
+  },
+  {
+    path: "/reg",
+    name: "Registration",
+    component: Registration,
+  },
+];
 
-const router = createRouter({
-  history: createWebHashHistory(),
-  routes
-})
-
-export default router
+export const router = createRouter({
+  history: createWebHistory(process.env.BASE_URL),
+  routes,
+});
