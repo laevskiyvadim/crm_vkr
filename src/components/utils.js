@@ -15,8 +15,8 @@ const deadlinesType = (endTime, startTime) => {
   }
 };
 
-export const setData = (props, data, len) => {
-  const { user, users, task, endTime, startTime } = props.value;
+export const setData = (prop, data, len) => {
+  const { user, users, task, endTime, startTime } = prop.value;
   const taskUser = users.filter((el) => el.id == user);
   const { first_name, last_name, phone, email } = taskUser[0];
   data.first_name = first_name;
@@ -31,7 +31,8 @@ export const setData = (props, data, len) => {
 };
 
 export const openEditPopup = (e, store, item) => {
-  e.preventDefault();
   const { commit } = store;
+  e.preventDefault();
+  document.querySelector("body").classList.add("noMove");
   commit("set_popup", item.value);
 };

@@ -11,9 +11,6 @@ const authGuard = (to, from, next) => {
   !isAuthorized() ? next({ name: "Login" }) : next();
 };
 
-const asyncLoad = (component, folder = "components") =>
-  import(`../${folder}/${component}`).then((result) => result[component]);
-asyncLoad;
 const routes = [
   {
     path: "/",

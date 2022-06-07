@@ -1,4 +1,4 @@
-import { defineComponent, ref, computed, h } from "vue";
+import { defineComponent, ref, computed, h, onMounted, onUnmounted } from "vue";
 import { useStore } from "vuex";
 import { Nav } from "../../components/shared/Nav";
 import { Header } from "../../components/shared/Header";
@@ -12,15 +12,29 @@ export const Content = defineComponent({
     const store = useStore();
     const { commit, state } = store;
     const mainActive = ref(false);
-    const mainCls = () => (mainActive.value ? "active" : "");
-    const popup22 = ref(false);
+    const blockToggle = ref(false);
 
+    const resize = function () {
+      if (window.innerWidth > 1250) blockToggle.value = false;
+      else blockToggle.value = true;
+    };
+    onMounted(() => {
+      window.addEventListener("resize", resize);
+      resize();
+    });
+
+    onUnmounted(() => {
+      window.removeEventListener("resize");
+    });
+
+    const mainCls = () =>
+      mainActive.value || blockToggle.value ? "active" : "";
     const toggleMain = () => {
-      mainActive.value = !mainActive.value;
+      if (!blockToggle.value) mainActive.value = !mainActive.value;
     };
 
-    const noMove = () => (popup22.value ? "no-move" : "");
     const popupCondition = computed(() => Object.keys(state.popup).length);
+    const noMove = () => (popupCondition.value ? "no-move" : "");
     const closePopup = () => {
       document.querySelector("body").classList.remove("noMove");
       commit("set_popup", {});
@@ -30,7 +44,7 @@ export const Content = defineComponent({
       h(
         <div>
           <div class={noMove}>
-            <Nav mainToggle={toggleMain} />
+            <Nav mainToggle={toggleMain} menuActive={!!mainCls()} />
             <main class={mainCls()}>
               <Header />
               <div class="canban">

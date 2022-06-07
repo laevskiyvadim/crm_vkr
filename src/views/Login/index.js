@@ -1,7 +1,6 @@
-import { defineComponent, reactive } from "vue";
+import { defineComponent, reactive, h } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
-import { h } from "vue";
 import { PreLogin } from "../../components/shared/PreLogin";
 import "./style.scss";
 export const Login = defineComponent({

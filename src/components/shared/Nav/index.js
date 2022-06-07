@@ -6,34 +6,36 @@ import { useStore } from "vuex";
 import "./style.scss";
 
 export const Nav = defineComponent({
-  props: { mainToggle: { type: Function } },
+  props: {
+    mainToggle: { type: Function },
+    menuActive: { type: Boolean },
+  },
+  components: { Logo, Link, LinkSubLinks },
 
   setup(props) {
-    const { mainToggle } = toRefs(props);
+    const { mainToggle, menuActive } = toRefs(props);
     const store = useStore();
     const liActive = ref(false);
-    const MenuActive = ref(false);
 
     const links = computed(() => store.state.links);
 
     const toggleClass = () => {
-      if (MenuActive.value) {
-        MenuActive.value = !MenuActive.value;
+      if (menuActive.value) {
         liActive.value = !liActive.value;
         mainToggle.value();
       } else {
         liActive.value = !liActive.value;
       }
     };
+
     const toggleMenu = () => {
-      MenuActive.value = !MenuActive.value;
-      if (MenuActive.value) liActive.value = false;
+      if (menuActive.value) liActive.value = false;
       mainToggle.value();
     };
 
     const p = () => (
       <p class="menu__sub__title">
-        Сделано с любовью в России
+        Сделано с любовью в УКИТ
         <svg
           width="15"
           height="15"
@@ -91,12 +93,14 @@ export const Nav = defineComponent({
         active: items != null ? liActive.value : null,
       };
     };
+
     const navCls = ({ value }) => {
       return { menu: true, active: value };
     };
+
     return () =>
       h(
-        <nav class={navCls(MenuActive)}>
+        <nav class={navCls(menuActive)}>
           <Logo toggleMenu={toggleMenu} />
           <div class="menu__title">Меню CRM</div>
           {ul()}
@@ -104,6 +108,4 @@ export const Nav = defineComponent({
         </nav>
       );
   },
-
-  components: { Logo, Link, LinkSubLinks },
 });

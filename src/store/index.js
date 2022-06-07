@@ -24,9 +24,6 @@ export const store = createStore({
             { id: 2, title: "Список", url: "/list" },
           ],
         },
-        // { id: 2, title: "Аналитика", class: "icon-analytics", url: "/analitycs" },
-        // { id: 3, title: "Чаты", class: "icon-chat", url: "/chats" },
-        // { id: 4, title: "Настройки", class: "icon-settings", url: "/settings" },
       ],
       currentUser: {},
       tasks: [],
@@ -70,9 +67,8 @@ export const store = createStore({
           api.defaults.headers["Authorization"] = `Token ${token.auth_token}`;
         });
     },
-    // todo
-    async registration({ commit }, data) {
-      commit;
+
+    async registration(ctx, data) {
       await api.post(`/auth/users/`, data);
     },
 
